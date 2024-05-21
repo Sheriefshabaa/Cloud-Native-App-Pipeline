@@ -6,6 +6,10 @@ module "vpc" {
   public_subnet_config  = var.public_subnet_config
 }
 
+
+/****************************
+          EKS Cluster
+*****************************/
 data "aws_iam_policy_document" "eks-role" {
   statement {
     effect = "Allow"
@@ -41,13 +45,9 @@ resource "aws_eks_cluster" "eks_cluster" {
   depends_on = [aws_iam_role_policy_attachment.eks-AmazonEKSClusterPolicy]
 }
 
-# # Optionally, enable Security Groups for Pods
-# # Reference: https://docs.aws.amazon.com/eks/latest/userguide/security-groups-for-pods.html
-# resource "aws_iam_role_policy_attachment" "example-AmazonEKSVPCResourceController" {
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
-#   role       = aws_iam_role.eks.name
-# }
-
+/****************************
+        EKS Node Group
+*****************************/
 data "aws_iam_policy_document" "nodeGroup-role" {
   statement {
     effect = "Allow"

@@ -86,7 +86,7 @@ resource "aws_security_group" "public_instance_sg" {
   vpc_id = var.vpc_id
 
   name = "${var.name}-public-instance-sg"
-  description = "This is a sec group for apache server instances to allow all traffic"
+  description = "This is a sec group for public instances to allow all traffic"
 
   # Ingress rules
   ingress {

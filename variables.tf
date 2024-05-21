@@ -8,6 +8,11 @@ variable "region" {
   description = "Name of the region"
 }
 
+variable "availability_zone" {
+  type        = string
+  description = "Availability zone within the region, used for ebs volume"
+}
+
 variable "vpc_cidr" {
   type = string
   description = "CIDR block for vpc. ex: 10.0.0.0/16"
@@ -29,4 +34,8 @@ variable "ec2_config" {
 
 variable "lb_config" {
   type = map(any)
+}
+
+variable "volume_type" {
+  type = string
 }
