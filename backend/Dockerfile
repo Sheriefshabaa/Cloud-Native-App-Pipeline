@@ -9,11 +9,8 @@ RUN npm install
 # Copy the entire application code
 COPY . .
 
-# Set environment variable for PATH
-ENV PATH /app/node_modules/.bin:$PATH
-
 # Expose the application port
-EXPOSE 3000
+EXPOSE 3001
 
 # Command to run the application
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
