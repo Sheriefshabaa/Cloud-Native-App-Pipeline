@@ -39,7 +39,7 @@ resource "aws_volume_attachment" "ebs_attachment" {
 }
 
 resource "aws_iam_role" "backup_role" {
-  name = "aws_backup_role"
+  name = "h_backup_role" 
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -52,6 +52,7 @@ resource "aws_iam_role" "backup_role" {
     }]
   })
 }
+
 
 resource "aws_iam_role_policy_attachment" "backup_role_policy" {
   role       = aws_iam_role.backup_role.name

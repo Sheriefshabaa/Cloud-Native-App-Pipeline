@@ -39,3 +39,15 @@ variable "lb_config" {
 variable "volume_type" {
   type = string
 }
+
+variable "desired_size" {
+}
+
+variable "max_size" {
+}
+
+variable "min_size" {
+}
+
+variable "max_unavailable" {
+}
