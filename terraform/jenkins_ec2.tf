@@ -18,6 +18,11 @@ module "ec2" {
   public_instance_sg_id = module.sg.public_instance_sg_id
 }
 
+resource "local_file" "ips" {
+  content  = "[jenkins_server]\n${module.ec2.public_ec2_ips[0]}"
+  filename = "./ansible/inventory"
+}
+
 /****************************
     Jenkins Instance Backup
 *****************************/

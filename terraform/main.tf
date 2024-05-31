@@ -16,4 +16,3 @@ module "eks" {
   min_size        = var.min_size
   max_unavailable = var.max_unavailable
 }
-

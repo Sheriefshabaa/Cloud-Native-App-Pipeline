@@ -1,0 +1,83 @@
+- name: Jenkins Server Env. Setting Playbook
+  hosts: jenkins_server
+
+  tasks:
+
+  # ***** Dependencies Plays *****
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+      state: present
+
+  - name: Install Dependencies
+    apt:
+      name:
+        - curl
+        - unzip
+        - gnupg
+      state: present
+
+  # ***** Jenkins Plays *****
+  - name: Install Jenkins Repository key
+    apt_key:
+      url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
+      state: present
+
+  - name: Add Jenkins repository
+    apt_repository:
+      repo: 'deb https://pkg.jenkins.io/debian-stable binary/'
+      state: present
+
+  - name: Install Java OpenJDK
+    apt:
+      name: openjdk-11-jre
+      update_cache: yes
+      state: present
+
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+      state: present
+
+  - name: Install Jenkins
+    apt:
+      name: jenkins
+      state: present
+
+  - name: Start and Enable Jenkins Service
+    systemd:
+      name: jenkins
+      enabled: yes
+      state: started
+
+  - name: Retrieve initialAdminPassword file
+    fetch:
+      src: /var/lib/jenkins/secrets/initialAdminPassword
+      dest: "{{ playbook_dir }}/initialAdminPassword"
+      flat: yes
+
+  # ***** Docker Plays *****
+  - name: Install Docker
+    apt:
+      name: docker.io
+      state: present
+  
+  - name: Add Jenkins User to Docker group
+    user:
+      name: 
+        - jenkins
+        - ubuntu
+      groups: docker
+      append: yes
+
+  - name: Start and Enable Docker Service
+    systemd:
+      name: docker
+      enabled: yes
+      state: started
+
+  # ***** AWS CLI Plays *****
+  - name: Download AWS CLI
+    get_url:
+      url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+      dest: "/tmp/awscliv2.zip"
