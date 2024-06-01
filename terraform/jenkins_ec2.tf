@@ -20,7 +20,7 @@ module "ec2" {
 
 resource "local_file" "ips" {
   content  = "[jenkins_server]\n${module.ec2.public_ec2_ips[0]}"
-  filename = "./ansible/inventory"
+  filename = "../ansible/inventory"
 }
 
 /****************************

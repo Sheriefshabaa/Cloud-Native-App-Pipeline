@@ -64,9 +64,13 @@
   
   - name: Add Jenkins User to Docker group
     user:
-      name: 
-        - jenkins
-        - ubuntu
+      name: jenkins
+      groups: docker
+      append: yes
+
+  - name: Add Ubuntu User to Docker group
+    user:
+      name: ubuntu
       groups: docker
       append: yes
 
@@ -81,3 +85,61 @@
     get_url:
       url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
       dest: "/tmp/awscliv2.zip"
+
+  - name: Unzip AWS CLI package
+    unarchive:
+      src: "/tmp/awscliv2.zip"
+      dest: "/tmp"
+      remote_src: yes
+    
+  - name: Install & Update AWS CLI
+    command: "/tmp/aws/install --update"
+
+  # ***** Kubectl Plays *****
+  - name: Get the stable kubectl version
+    shell: "curl -sL https://dl.k8s.io/release/stable.txt"
+    register: kubectl_version
+    changed_when: false
+    failed_when: kubectl_version.stdout is undefined or kubectl_version.stdout == '' or kubectl_version.stdout | regex_search('html')
+
+  - name: debug Downloaded kubectl version
+    debug:
+      msg: "Downloaded kubectl version: {{ kubectl_version.stdout }}"
+  
+  - name: Download kubectl binary
+    get_url:
+      url: "https://dl.k8s.io/release/{{ kubectl_version.stdout }}/bin/linux/amd64/kubectl"
+      dest: "/tmp/kubectl"
+      mode: '0755'
+    when: kubectl_version.stdout is defined and kubectl_version.stdout != '' and not kubectl_version.stdout | regex_search('html')
+
+  - name: Download kubectl checksum
+    get_url:
+      url: "https://dl.k8s.io/release/{{ kubectl_version.stdout }}/bin/linux/amd64/kubectl.sha256"
+      dest: "/tmp/kubectl.sha256"
+      mode: '0644'
+    when: kubectl_version.stdout is defined and kubectl_version.stdout != '' and not kubectl_version.stdout | regex_search('html')
+
+  - name: Verify kubectl Binary
+    shell: echo "$(cat /tmp/kubectl.sha256)  /tmp/kubectl" | sha256sum --check
+    register: kubectl_checksum
+    failed_when: "'OK' not in kubectl_checksum.stdout"
+    when: kubectl_version.stdout is defined and kubectl_version.stdout != '' and not kubectl_version.stdout | regex_search('html')
+
+  - name: Install kubectl
+    become: true
+    copy:
+      src: /tmp/kubectl
+      dest: /usr/local/bin/kubectl
+      mode: '0775'
+      remote_src: yes
+    when: kubectl_checksum.rc == 0
+
+  - name: Verify kubectl version
+    command: kubectl version --client
+    register: kubectl_version_check
+    changed_when: false
+
+  - name: debug Installed kubectl version
+    debug:
+      msg: "Installed kubectl version: {{ kubectl_version_check.stdout }}"

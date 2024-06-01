@@ -1,5 +1,5 @@
 resource "aws_iam_role" "eks_cluster_role" {
-  name = "${var.name}_eks_cluster_role"
+  name = "${var.name}-eks-cluster-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -23,7 +23,7 @@ resource "aws_iam_role_policy_attachment" "eks-AmazonEKSClusterPolicy" {
 
 
 resource "aws_eks_cluster" "eks_cluster" {
-  name     = "${var.name}_eks_cluster"
+  name     = "${var.name}-eks-cluster"
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
@@ -37,7 +37,7 @@ resource "aws_eks_cluster" "eks_cluster" {
         EKS Node Group
 *****************************/
 resource "aws_iam_role" "nodeGroup_role" {
-  name = "${var.name}_nodeGroup_role"
+  name = "${var.name}-nodeGroup-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -69,9 +69,14 @@ resource "aws_iam_role_policy_attachment" "nodes-AmazonEC2ContainerRegistryReadO
   role       = aws_iam_role.nodeGroup_role.id
 }
 
+resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  role       = aws_iam_role.nodeGroup_role.id
+}
+
 resource "aws_eks_node_group" "nodes" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
-  node_group_name = "${var.name}_nodes"
+  node_group_name = "${var.name}-nodes"
   node_role_arn   = aws_iam_role.nodeGroup_role.arn
   subnet_ids      = var.public_subnet_ids
   capacity_type  = "ON_DEMAND"
@@ -96,4 +101,25 @@ resource "aws_eks_node_group" "nodes" {
     aws_iam_role_policy_attachment.nodes-AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.nodes-AmazonEC2ContainerRegistryReadOnly,
   ]
+}
+
+
+/****************************
+        EKS Dependencies
+*****************************/
+resource "aws_eks_addon" "cnii" {
+  cluster_name = aws_eks_cluster.eks_cluster.name
+  addon_name   = "vpc-cni"
+}
+resource "aws_eks_addon" "coredns" {
+  cluster_name                = aws_eks_cluster.eks_cluster.name
+  addon_name                  = "coredns"
+}
+resource "aws_eks_addon" "kube-proxy" {
+  cluster_name                = aws_eks_cluster.eks_cluster.name
+  addon_name                  = "kube-proxy"
+}
+resource "aws_eks_addon" "aws-ebs-csi-driver" {
+  cluster_name                = aws_eks_cluster.eks_cluster.name
+  addon_name                  = "aws-ebs-csi-driver"
 }
