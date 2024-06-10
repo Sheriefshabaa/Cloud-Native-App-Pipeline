@@ -80,6 +80,14 @@
       enabled: yes
       state: started
 
+  - name: Restart Jenkins and Docker
+    systemd:
+      name: "{{ item }}"
+      state: restarted
+    loop:
+      - jenkins
+      - docker
+
   # ***** AWS CLI Plays *****
   - name: Download AWS CLI
     get_url:
