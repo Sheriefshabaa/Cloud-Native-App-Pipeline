@@ -24,14 +24,14 @@ pipeline {
     stage('Logging into AWS ECR') {
       steps {
         sh "echo Welcome To Cloud-Native-App Pipeline"
-        sh "STAGE 1: Loging into AWS..."
+        sh "echo STAGE 1: Loging into AWS..."
         sh "aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
       }
     }
 
     stage('Building & pushing images') {
       steps {
-        sh "STAGE 2: Building & pushing images..."
+        sh "echo STAGE 2: Building & pushing images..."
         script {
           dir('app/backend') {
             sh "docker build -t ${env.BACKEND_REPO_URL}:${env.IMAGE_TAG} ."
@@ -49,7 +49,7 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')]) {
 
-          sh "STAGE 3: Update deployment files..."
+          sh "echo STAGE 3: Update deployment files..."
 
           sh "git remote set-url origin hhtps://${env.GIT_USERNAME}:${GITHUB_TOKEN}@github.com/${env.GIT_USERNAME}/${env.GIT_REPO}.git/"
           sh "git config user.email jenkins@gmail.com"
@@ -67,7 +67,7 @@ pipeline {
 
     // stage('Applying deployments'){
     //   steps{
-    //     sh "STAGE 4: Update deployment files..."
+    //     sh "echo STAGE 4: Update deployment files..."
     //     sh "chmod +x ./k8s/k8s.sh"
     //     sh "aws eks update-kubeconfig --region ${env.AWS_DEFAULT_REGION} --name 4{env.EKS_NAME}"
     //     sh "./k8s/k8s.sh"
