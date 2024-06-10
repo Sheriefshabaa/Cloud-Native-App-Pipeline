@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:14-alpine as build
 
 WORKDIR /app
 
@@ -12,8 +12,12 @@ COPY . .
 # Set environment variable for PATH
 ENV PATH /app/node_modules/.bin:$PATH
 
-# Expose the application port
-EXPOSE 3000
+RUN npm run build
 
-# Command to run the application
-CMD ["npm", "start"]
+FROM nginx:alpine
+
+COPY --from=build /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
