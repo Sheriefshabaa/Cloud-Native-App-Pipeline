@@ -31,7 +31,7 @@ pipeline {
 
     stage('Building & pushing images') {
       steps {
-        sh "echo STAGE 2: Building & pushing images..."
+        echo "echo STAGE 2: Building & pushing images..."
         script {
           dir('app/backend') {
             sh "docker build -t ${env.BACKEND_REPO_URL}:${env.IMAGE_TAG} ."
