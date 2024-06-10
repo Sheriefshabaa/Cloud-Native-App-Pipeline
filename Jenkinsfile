@@ -9,8 +9,8 @@ pipeline {
    
     ECR_BACKEND_REPO = "h-project-ecr-backend-image"
     ECR_FRONTEND_REPO = "h-project-ecr-frontend-image"
-    BACKEND_REPO_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_BACKEND_NAME}"
-    FRONTEND_REPO_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_FRONTEND_NAME}"
+    BACKEND_REPO_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_BACKEND_REPO}"
+    FRONTEND_REPO_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_FRONTEND_REPO}"
     IMAGE_TAG = "${BUILD_NUMBER}"
 
     GIT_USERNAME = "Hesham-14"
@@ -51,7 +51,7 @@ pipeline {
 
           sh "echo STAGE 3: Update deployment files..."
 
-          sh "git remote set-url origin hhtps://${env.GIT_USERNAME}:${GITHUB_TOKEN}@github.com/${env.GIT_USERNAME}/${env.GIT_REPO}.git/"
+          sh "git remote set-url origin https://${env.GIT_USERNAME}:${GITHUB_TOKEN}@github.com/${env.GIT_USERNAME}/${env.GIT_REPO}.git/"
           sh "git config user.email jenkins@gmail.com"
           sh "git config user.name jenkins"
 
